@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Love Letter for You</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Quicksand:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ff85a1;
+            --bg: #fff0f3;
+            --envelope-color: #ff758f;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Falling Hearts Animation */
+        .heart {
+            position: fixed;
+            top: -10px;
+            font-size: 20px;
+            color: var(--primary);
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear forwards;
+            z-index: 0;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(360deg); }
+        }
+
+        /* Welcome Screen */
+        #welcome-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .floating-heart {
+            font-size: 80px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Quiz Styling */
+        #quiz-container {
+            display: none; /* Hidden initially */
+            z-index: 50;
+            transition: all 0.5s ease;
+        }
+
+        .option-btn {
+            transition: all 0.2s;
+            border: 2px solid #ff85a1;
+        }
+
+        .option-btn:hover {
+            background-color: #ff85a1;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        /* Sad Teary Emoji Overlay */
+        #sad-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 240, 243, 0.95);
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .sad-emoji {
+            font-size: 120px;
+            animation: gentle-wobble 2s ease-in-out infinite;
+        }
+
+        @keyframes gentle-wobble {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            75% { transform: translateX(5px) rotate(2deg); }
+        }
+
+        .shake {
+            animation: shake-container 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake-container {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Envelope Styling */
+        .container {
+            position: relative;
+            display: none; 
+            justify-content: center;
+            align-items: center;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background-color: var(--secondary);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid var(--primary);
+            transform-origin: top;
+            transition: transform 0.6s ease-in-out;
+            z-index: 4;
+        }
+
+        .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--envelope-color);
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 100px solid var(--secondary);
+            z-index: 3;
+        }
+
+        .letter {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 280px;
+            height: 180px;
+            background: white;
+            border-radius: 5px;
+            transition: transform 0.6s ease-in-out;
+            z-index: 2;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-wrapper.open .letter {
+            transform: translateY(-130px);
+            height: 280px;
+        }
+
+        .letter-photo {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 3px solid #fef2f2;
+        }
+
+        .letter-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1rem;
+            color: #444;
+            text-align: center;
+        }
+
+        .heart-seal {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 30px;
+            z-index: 5;
+            transition: opacity 0.3s;
+        }
+
+        #message-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 240, 243, 0.98);
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        #closing-scene {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 200;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .big-heart {
+            font-size: 100px;
+            animation: heartbeat 1.2s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.3); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.3); }
+            70% { transform: scale(1); }
+        }
+
+        .fade-in { animation: fadeIn 1s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen">
+        <div class="floating-heart">❤️</div>
+        <h1 class="font-['Dancing_Script'] text-5xl text-pink-600 mt-6 mb-2">Hello, My Love</h1>
+        <p class="text-gray-500 mb-8 px-6">I have a little surprise for you today...</p>
+        <button onclick="startApp()" class="px-10 py-4 bg-pink-500 text-white rounded-full font-bold shadow-xl hover:bg-pink-600 transform transition active:scale-95">
+            Tap to Start
+        </button>
+    </div>
+
+    <!-- SAD TEARY EMOJI OVERLAY -->
+    <div id="sad-overlay">
+        <div class="sad-emoji">😥</div>
+        <h2 class="text-3xl font-bold mt-6 text-pink-600">Aww, seriously puppy??...</h2>
+        <p class="mt-2 text-gray-600 font-medium">I'M SO SADD 🥺</p>
+    </div>
+
+    <!-- QUIZ GATE -->
+    <div id="quiz-container" class="max-w-md w-full mx-4 bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-pink-50">
+        <div id="quiz-content">
+            <h2 id="question-text" class="text-xl font-bold text-pink-600 mb-6 font-['Quicksand']">Question 1</h2>
+            <div id="options-container" class="flex flex-col gap-3"></div>
+            <p id="error-msg" class="text-red-400 text-sm mt-4 opacity-0 transition-opacity duration-300">Incorrect answer! Let's try again.</p>
+        </div>
+    </div>
+
+    <!-- MAIN VIEW (ENVELOPE) -->
+    <div id="main-view" class="container">
+        <div class="flex flex-col items-center">
+            <h1 class="text-pink-600 text-xl font-bold mb-32 animate-pulse text-center px-4">Congratulations puppy for answering correctly!<br>Tap the envelope to get your gift. ❤️</h1>
+            
+            <div class="envelope-wrapper" id="envelope-wrap" onclick="toggleEnvelope()">
+                <div class="flap"></div>
+                <div class="pocket"></div>
+                <div class="letter" id="letter">
+                    <img src="https://drive.google.com/thumbnail?id=1bj4ETL6Kq8tEnQPwIWx0yrWJDS8o1aiA&sz=w1000" alt="Couple Photo" class="letter-photo">
+                    <div class="letter-text">
+                        <p>...</p>A special gift for my lovely puppy.
+                        <p class="text-xs mt-2 text-pink-400">Click again for full message</p>
+                    </div>
+                </div>
+                <div class="heart-seal">❤️</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MESSAGE MODAL -->
+    <div id="message-modal">
+        <div class="max-w-lg w-full bg-white p-6 rounded-3xl shadow-2xl border-2 border-pink-100 fade-in text-center">
+            <img src="https://drive.google.com/thumbnail?id=1bj4ETL6Kq8tEnQPwIWx0yrWJDS8o1aiA&sz=w1000" alt="Memory Photo" class="w-full h-48 object-cover rounded-2xl mb-6 shadow-md">
+            
+            <h2 class="font-['Dancing_Script'] text-4xl text-pink-600 mb-4">A special gift for my favorite puppy.</h2>
+            <div class="space-y-4 text-gray-700 text-md overflow-y-auto max-h-60 px-2 text-left">
+                <p>Thank you for being so patient in answering the quiz, baby. I'm so proud of you!!!</p>
+                <p>Even though there's distance between us today, know that you're the first thing on my mind this Valentine's Day. Distance is just a test to see how far love can travel, and I think we're doing an amazing job. I'm counting the days until I can hold you again.</p>
+                <p>I hope we continue like this, supporting and loving each other forever. Happy Valentine's Day once again, my love.</p>
+                <p class="font-bold text-pink-500 text-2xl mt-4 text-center">I ALWAYS LOVE YOU WITH ALL MY HEART! ❤️</p>
+            </div>
+            <button onclick="finishJourney()" class="mt-8 px-8 py-3 bg-pink-500 text-white rounded-full font-bold shadow-lg hover:bg-pink-600 transition-all">
+                Close Message
+            </button>
+        </div>
+    </div>
+
+    <!-- CLOSING SCENE -->
+    <div id="closing-scene" class="fade-in">
+        <div class="big-heart">❤️</div>
+        <h2 class="font-['Dancing_Script'] text-5xl text-pink-600 mt-8 mb-4">HAPPY VALENTINE'S BABYY</h2>
+        <p class="text-gray-600 italic">"thank you for coming into my life, I will always love you with all my heart."</p>
+        <p class="mt-10 text-pink-400 font-medium">From your love 'Lau</p>
+        <button onclick="location.reload()" class="mt-12 text-sm text-gray-400 hover:text-pink-500 transition underline">Start Over</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Question 1: Are you ready sayanggg?",
+                options: ["No.", "READYYYYY"],
+                correct: 1 
+            },
+            {
+                question: "Question 2: Guess how much I love you?",
+                options: ["1%", "Unlimited",],
+                correct: 1
+            },
+            {
+                question: "Question 3: Will you be my valentines?",
+                options: ["No", "YESSS!"],
+                correct: 1
+            }
+        ];
+
+        let currentStep = 0;
+
+        function startApp() {
+            const welcome = document.getElementById('welcome-screen');
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.style.visibility = 'hidden';
+                document.getElementById('quiz-container').style.display = 'block';
+                loadQuiz();
+            }, 800);
+        }
+
+        function loadQuiz() {
+            const q = quizData[currentStep];
+            document.getElementById('question-text').innerText = q.question;
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn py-3 px-4 rounded-xl text-pink-600 font-medium bg-pink-50';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(index) {
+            const q = quizData[currentStep];
+            const container = document.getElementById('quiz-container');
+
+            if (index === q.correct) {
+                currentStep++;
+                document.getElementById('error-msg').classList.add('opacity-0');
+                if (currentStep < quizData.length) {
+                    loadQuiz();
+                } else {
+                    showEnvelope();
+                }
+            } else {
+                const overlay = document.getElementById('sad-overlay');
+                
+                overlay.style.display = 'flex';
+                container.classList.add('shake');
+                document.getElementById('error-msg').classList.remove('opacity-0');
+
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    container.classList.remove('shake');
+                }, 2000); 
+            }
+        }
+
+        function showEnvelope() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('main-view').style.display = 'flex';
+        }
+
+        let isOpen = false;
+        function toggleEnvelope() {
+            const wrapper = document.getElementById('envelope-wrap');
+            if (!isOpen) {
+                wrapper.classList.add('open');
+                isOpen = true;
+            } else {
+                document.getElementById('message-modal').style.display = 'flex';
+            }
+        }
+
+        function finishJourney() {
+            document.getElementById('message-modal').style.display = 'none';
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('closing-scene').style.display = 'flex';
+            setInterval(createHeart, 150);
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.opacity = Math.random();
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+
+        setInterval(createHeart, 300);
+    </script>
+</body>
+</html>
